@@ -1,0 +1,283 @@
+{
+  "manga": {
+    "title": "Moshimo, Yuurei ga Hatsukoi o Shitara",
+    "alternativeTitle": "もしも、幽霊が初恋をしたら",
+    "cover": "",
+    "description": "Aku adalah Sōta. Cowok SMA otaku introvert tanpa pengalaman cinta… ya, dulu sih begitu. Apa? Kau pikir aku sudah kehilangan perjaka dan berubah jadi anak gaul? Bukan, bukan itu. Bukan lagi 'cowok SMA' — karena sekarang aku sudah jadi hantu. Dengan kata lain, aku adalah mantan manusia… seorang otaku introvert perjaka yang sudah meninggal. Aku hampir tidak ingat apa pun tentang kehidupan sebelumnya, dan satu-satunya hal yang tersisa di ingatanku hanyalah fakta bahwa aku masih perjaka. Mungkin itu adalah penyesalan terakhirku. Dan entah bagaimana, saat tersadar, aku tidak bisa keluar dari sekolah khusus perempuan ini — aku terperangkap, jadi semacam jiwari rei (hantu terikat tempat). Jujur, aku benar-benar bingung waktu itu. Tapi meski saat hidup aku ini cowok introvert yang terlalu takut buat ngomong ke cewek… kalau sudah jadi hantu, aku bisa lihat berbagai macam penampilan cewek — yang begini, yang begitu — tanpa batas! Ada rasa bersalah sih… tapi jadi hantu juga nggak buruk-buruk amat! Tapi belum lama kemudian, aku melihat gantungan kunci karakter favoritku jatuh di dalam sekolah. Aku pun hendak memungutnya, dan— 'Kenapa ada laki-laki… di sekolah khusus perempuan…?' Dia itu cewek yang manis, baik hati, mudah akrab dengan siapa saja, populer… dan satu-satunya yang bisa melihat keberadaanku sebagai hantu serta peduli padaku. Dan aku pun jatuh cinta pada seorang gadis… yang jelas berada di luar jangkauanku.",
+    "author": "Shichifuku Sayuri",
+    "artist": "Shichifuku Sayuri",
+    "genre": [
+      "Shounen",
+      "Comedy",
+      "Drama",
+      "Romance",
+      "Horror",
+      "Mystery",
+      "Ghost"
+    ],
+    "status": "END",
+    "views": 0,
+    "links": {
+      "mangadex": "https://mangadex.org/title/832a0bcb-f58a-4118-9130-43c03d289a8d/moshimo-yuurei-ga-hatsukoi-o-shitara",
+      "raw": "https://bookwalker.jp/series/494400/"
+    },
+    "repoUrl": "https://raw.githubusercontent.com/nurananto/YuureigaHatsukoi/main/",
+    "imagePrefix": "Image",
+    "imageFormat": "webp",
+    "lockedChapters": []
+  },
+  "chapters": {
+    "1": {
+      "title": "Chapter 1",
+      "chapter": 1,
+      "folder": "1",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "2": {
+      "title": "Chapter 2",
+      "chapter": 2,
+      "folder": "2",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "3": {
+      "title": "Chapter 3",
+      "chapter": 3,
+      "folder": "3",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "4": {
+      "title": "Chapter 4",
+      "chapter": 4,
+      "folder": "4",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "5": {
+      "title": "Chapter 5",
+      "chapter": 5,
+      "folder": "5",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "6": {
+      "title": "Chapter 6",
+      "chapter": 6,
+      "folder": "6",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "7": {
+      "title": "Chapter 7",
+      "chapter": 7,
+      "folder": "7",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "8": {
+      "title": "Chapter 8",
+      "chapter": 8,
+      "folder": "8",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "9": {
+      "title": "Chapter 9",
+      "chapter": 9,
+      "folder": "9",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "10": {
+      "title": "Chapter 10",
+      "chapter": 10,
+      "folder": "10",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "11": {
+      "title": "Chapter 11",
+      "chapter": 11,
+      "folder": "11",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "12": {
+      "title": "Chapter 12",
+      "chapter": 12,
+      "folder": "12",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "13": {
+      "title": "Chapter 13",
+      "chapter": 13,
+      "folder": "13",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "14": {
+      "title": "Chapter 14",
+      "chapter": 14,
+      "folder": "14",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "15": {
+      "title": "Chapter 15",
+      "chapter": 15,
+      "folder": "15",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "16": {
+      "title": "Chapter 16",
+      "chapter": 16,
+      "folder": "16",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "17": {
+      "title": "Chapter 17",
+      "chapter": 17,
+      "folder": "17",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "18": {
+      "title": "Chapter 18",
+      "chapter": 18,
+      "folder": "18",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "19": {
+      "title": "Chapter 19",
+      "chapter": 19,
+      "folder": "19",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "20": {
+      "title": "Chapter 20",
+      "chapter": 20,
+      "folder": "20",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "21": {
+      "title": "Chapter 21",
+      "chapter": 21,
+      "folder": "21",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "22": {
+      "title": "Chapter 22",
+      "chapter": 22,
+      "folder": "22",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "23": {
+      "title": "Chapter 23",
+      "chapter": 23,
+      "folder": "23",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "24": {
+      "title": "Chapter 24",
+      "chapter": 24,
+      "folder": "24",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    },
+    "25": {
+      "title": "Chapter 25",
+      "chapter": 25,
+      "folder": "25",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    }
+  },
+  "lastUpdated": "2025-12-03T20:53:07+07:00",
+  "lastChapterUpdate": "2025-12-03T20:49:56+07:00"
+}
