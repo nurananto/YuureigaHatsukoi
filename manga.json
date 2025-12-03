@@ -26,7 +26,18 @@
     "imageFormat": "webp",
     "lockedChapters": []
   },
-  "chapters": {},
-  "lastUpdated": "2025-12-03T21:14:03+07:00",
-  "lastChapterUpdate": "2025-12-03T21:14:03+07:00"
+  "chapters": {
+    "1": {
+      "title": "Chapter 1",
+      "chapter": 1,
+      "folder": "1",
+      "uploadDate": "2025-12-03T20:49:56+07:00",
+      "totalPages": 32,
+      "pages": 32,
+      "locked": false,
+      "views": 0
+    }
+  },
+  "lastUpdated": "2025-12-03T21:16:14+07:00",
+  "lastChapterUpdate": "2025-12-03T20:49:56+07:00"
 }
