@@ -1,0 +1,68 @@
+name: 🔄 Sync Chapter Codes
+
+on:
+  # ✅ Manual trigger untuk sync codes dari Cloudflare KV
+  workflow_dispatch:
+  
+  # ✅ Auto-sync setiap hari jam 01:00 WIB (18:00 UTC)
+  schedule:
+    - cron: '0 18 * * *'
+
+jobs:
+  sync-codes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 🔄 Sync codes from Cloudflare KV
+        env:
+          CLOUDFLARE_WORKER_URL: ${{ secrets.CLOUDFLARE_WORKER_URL }}
+        run: |
+          echo "🔄 Syncing chapter codes from Cloudflare KV..."
+          node manga-automation.js sync-codes
+
+      - name: 📝 Check for changes
+        id: check_changes
+        run: |
+          git add -A chapter-codes-local.json
+          
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "ℹ️  No changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "✅ Changes detected!"
+            git status --short
+          fi
+
+      - name: 💾 Commit and push changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          TIMESTAMP=$(TZ='Asia/Jakarta' date '+%Y-%m-%d %H:%M:%S WIB')
+          git commit -m "🔄 Sync chapter codes from Cloudflare KV - $TIMESTAMP [skip ci]"
+          
+          git push origin main
+          
+          echo "✅ chapter-codes-local.json synced successfully!"
+
+      - name: ℹ️  No changes
+        if: steps.check_changes.outputs.has_changes != 'true'
+        run: |
+          echo "ℹ️  chapter-codes-local.json is already up to date"
+          echo "   No sync needed"

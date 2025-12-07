@@ -1,15 +1,6 @@
 /**
- * MANGA-AUTOMATION.JS - MANIFEST-BASED VERSION
- * ✅ Fix: Uses manifest.json instead of counting images
- * ✅ Fix: lastChapterUpdate uses LATEST unlocked chapter date
- * ✅ Fix: All timestamps converted to WIB (GMT+7)
- * ✅ NEW: Support for "oneshot" folder
- * 
- * Usage:
- * node manga-automation.js generate                → Generate manga.json
- * node manga-automation.js sync                    → Sync chapters
- * node manga-automation.js update-views            → Update manga views
- * node manga-automation.js update-chapters         → Update chapter views
+ * MANGA-AUTOMATION.JS - Complete Automation Script
+ * Handles: Generate manga.json, Sync chapters, Update views, Sync codes
  */
 
 const fs = require('fs');
@@ -17,18 +8,10 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // ============================================
-// CONSTANTS
-// ============================================
-
-const VIEW_THRESHOLD = 1;  // Update every 1 manga view (was 20)
-const CHAPTER_VIEW_THRESHOLD = 1;  // Update every 1 chapter view (was 10)
-
-// ============================================
 // WIB TIMEZONE HELPER (GMT+7)
 // ============================================
 
 function getWIBTimestamp() {
-    // Use toLocaleString with Asia/Jakarta timezone
     const date = new Date();
     const wibStr = date.toLocaleString('sv-SE', { timeZone: 'Asia/Jakarta' }).replace(' ', 'T');
     return wibStr + '+07:00';
@@ -42,679 +25,454 @@ function convertToWIB(isoString) {
 }
 
 // ============================================
-// UTILITY FUNCTIONS
+// GENERATE MANGA.JSON
 // ============================================
 
-function loadConfig() {
+/**
+ * Generate manga.json from manga-config.json and chapters
+ */
+async function generateMangaJson() {
     try {
-        const configFile = fs.readFileSync('manga-config.json', 'utf8');
-        return JSON.parse(configFile);
-    } catch (error) {
-        console.error('❌ Error reading manga-config.json:', error.message);
-        process.exit(1);
-    }
-}
-
-function loadJSON(filename) {
-    try {
-        if (fs.existsSync(filename)) {
-            const data = fs.readFileSync(filename, 'utf8');
-            return JSON.parse(data);
-        }
-    } catch (error) {
-        console.warn(`⚠️ Could not read ${filename}:`, error.message);
-    }
-    return null;
-}
-
-function saveJSON(filename, data) {
-    try {
-        const jsonString = JSON.stringify(data, null, 2);
-        fs.writeFileSync(filename, jsonString, 'utf8');
-        return true;
-    } catch (error) {
-        console.error(`❌ Error saving ${filename}:`, error.message);
-        return false;
-    }
-}
-
-// ============================================
-// NEW: ONESHOT HELPER FUNCTIONS
-// ============================================
-
-function isOneshotFolder(folderName) {
-    return folderName.toLowerCase() === 'oneshot';
-}
-
-function isNumericChapter(folderName) {
-    return /^\d+(\.\d+)?$/.test(folderName);
-}
-
-function getChapterSortValue(folderName) {
-    // Oneshot comes first (value -1)
-    if (isOneshotFolder(folderName)) {
-        return -1;
-    }
-    // Numeric chapters use their numeric value
-    return parseFloat(folderName);
-}
-
-function getChapterTitle(folderName) {
-    if (isOneshotFolder(folderName)) {
-        return 'Oneshot';
-    }
-    return `Chapter ${folderName}`;
-}
-
-function getChapterNumber(folderName) {
-    if (isOneshotFolder(folderName)) {
-        return 0; // Use 0 for oneshot
-    }
-    return parseFloat(folderName);
-}
-
-// ============================================
-// NEW: MANIFEST HELPER FUNCTIONS
-// ============================================
-
-function loadManifest(folderName) {
-    const manifestPath = path.join('.', folderName, 'manifest.json');
-    
-    try {
-        if (fs.existsSync(manifestPath)) {
-            const data = fs.readFileSync(manifestPath, 'utf8');
-            const manifest = JSON.parse(data);
-            return manifest;
-        }
-    } catch (error) {
-        console.warn(`⚠️ Could not read manifest in ${folderName}:`, error.message);
-    }
-    return null;
-}
-
-function getTotalPagesFromManifest(folderName) {
-    const manifest = loadManifest(folderName);
-    
-    if (manifest) {
-        // Try multiple possible fields
-        const totalPages = manifest.total_pages || manifest.totalPages || 
-                          (manifest.pages ? manifest.pages.length : 0);
+        console.log('📚 Generating manga.json...');
         
-        const icon = isOneshotFolder(folderName) ? '🎯' : '📊';
-        console.log(`  ${icon} ${folderName}: ${totalPages} pages (from manifest)`);
-        return totalPages;
-    }
-    
-    console.log(`  ⚠️  ${folderName}: No manifest.json found`);
-    return 0;
-}
-
-// ============================================
-// COMMAND 1: GENERATE MANGA.JSON
-// ============================================
-
-function getChapterFolders() {
-    const rootDir = '.';
-    
-    try {
-        const folders = fs.readdirSync(rootDir, { withFileTypes: true })
-            .filter(dirent => dirent.isDirectory())
-            .filter(dirent => !dirent.name.startsWith('.'))
-            .map(dirent => dirent.name)
-            .filter(name => {
-                // Accept numeric chapters OR "oneshot" folder
-                return isNumericChapter(name) || isOneshotFolder(name);
+        // Read manga-config.json
+        if (!fs.existsSync('manga-config.json')) {
+            throw new Error('manga-config.json not found!');
+        }
+        
+        const mangaConfig = JSON.parse(fs.readFileSync('manga-config.json', 'utf8'));
+        console.log('📖 Manga config loaded:', mangaConfig.title);
+        
+        // Get all chapter folders
+        const chapterFolders = fs.readdirSync('.')
+            .filter(item => {
+                if (!fs.statSync(item).isDirectory()) return false;
+                if (item.startsWith('.')) return false;
+                if (['node_modules', 'assets', '.github'].includes(item)) return false;
+                
+                // Must have manifest.json
+                return fs.existsSync(path.join(item, 'manifest.json'));
             })
             .sort((a, b) => {
-                // Sort by chapter value (oneshot = -1, comes first)
-                return getChapterSortValue(a) - getChapterSortValue(b);
+                const numA = parseFloat(a);
+                const numB = parseFloat(b);
+                return numA - numB;
             });
         
-        console.log(`📂 Found ${folders.length} chapter folders`);
-        if (folders.some(f => isOneshotFolder(f))) {
-            console.log('   🎯 Oneshot detected!');
-        }
-        return folders;
+        console.log(`📂 Found ${chapterFolders.length} chapters`);
         
-    } catch (error) {
-        console.error('❌ Error reading directories:', error.message);
-        return [];
-    }
-}
-
-function checkIfFolderExists(folderName) {
-    return fs.existsSync(path.join('.', folderName));
-}
-
-function getUploadDate(folderName, isLocked) {
-    const folderPath = path.join('.', folderName);
-    
-    try {
-        if (!isLocked) {
-            // UNLOCKED: Get date from manifest.json commit (when manifest was added)
-            const manifestGitCommand = `git log --reverse --format=%aI -- "${folderName}/manifest.json" 2>/dev/null | head -1`;
-            const manifestResult = execSync(manifestGitCommand, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+        // Build chapters object
+        const chapters = {};
+        const now = getWIBTimestamp();
+        
+        for (const folder of chapterFolders) {
+            const manifestPath = path.join(folder, 'manifest.json');
+            const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
             
-            if (manifestResult) {
-                const icon = isOneshotFolder(folderName) ? '🎯' : '📄';
-                console.log(`  ${icon} Using manifest.json commit date for ${folderName}`);
-                return convertToWIB(manifestResult);
-            }
-        }
-        
-        // LOCKED or NO MANIFEST: Get folder creation date
-        const folderGitCommand = `git log --reverse --format=%aI -- "${folderName}" | head -1`;
-        const folderResult = execSync(folderGitCommand, { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
-        
-        if (folderResult) {
-            return convertToWIB(folderResult);
-        }
-        
-        // Fallback: Use file system modification time
-        const stats = fs.statSync(folderPath);
-        return convertToWIB(stats.mtime.toISOString());
-    } catch (error) {
-        console.log(`⚠️  Could not get upload date for ${folderName}, using current date`);
-        return getWIBTimestamp();
-    }
-}
-
-function getOldChapterViews(chapterName, oldMangaData) {
-    if (!oldMangaData || !oldMangaData.chapters) {
-        return 0;
-    }
-    
-    const oldChapter = oldMangaData.chapters[chapterName];
-    if (oldChapter && oldChapter.views) {
-        return oldChapter.views;
-    }
-    
-    return 0;
-}
-
-function generateChaptersData(config, oldMangaData, isFirstTime) {
-    const allFolders = getChapterFolders();
-    const chapters = {};
-    
-    // 🔥 AUTO-CLEANUP: Remove old locked chapters that are no longer in config
-    let removedLockedChapters = [];
-    if (oldMangaData && oldMangaData.chapters) {
-        Object.keys(oldMangaData.chapters).forEach(chapterName => {
-            const oldChapter = oldMangaData.chapters[chapterName];
-            const folderExists = checkIfFolderExists(chapterName);
-            const inCurrentConfig = config.lockedChapters.includes(chapterName);
+            const chapterNum = parseFloat(folder);
+            const isLocked = mangaConfig.lockedChapters?.includes(folder) || false;
             
-            // If chapter was locked, has no folder, and removed from config → delete it
-            if (oldChapter.locked && !folderExists && !inCurrentConfig) {
-                removedLockedChapters.push(chapterName);
+            // Get existing views from old manga.json if exists
+            let existingViews = 0;
+            if (fs.existsSync('manga.json')) {
+                const oldData = JSON.parse(fs.readFileSync('manga.json', 'utf8'));
+                if (oldData.chapters && oldData.chapters[folder]) {
+                    existingViews = oldData.chapters[folder].views || 0;
+                }
             }
-        });
-        
-        if (removedLockedChapters.length > 0) {
-            console.log('\n🗑️  Auto-removing deleted locked chapters...');
-            console.log(`   Removed: ${removedLockedChapters.join(', ')}`);
-        }
-    }
-    
-    const allChapterNames = new Set([
-        ...allFolders,
-        ...config.lockedChapters
-    ]);
-    
-    const sortedChapterNames = Array.from(allChapterNames).sort((a, b) => {
-        return getChapterSortValue(a) - getChapterSortValue(b);
-    });
-    
-    console.log('\n📖 Processing chapters...');
-    
-    if (isFirstTime) {
-        console.log('🆕 First-time generation detected - setting all views to 0');
-    }
-    
-    const unlockedChaptersWithDates = [];
-    
-    sortedChapterNames.forEach(chapterName => {
-        const folderExists = checkIfFolderExists(chapterName);
-        const totalPages = folderExists ? getTotalPagesFromManifest(chapterName) : 0;
-        
-        const isInLockedList = config.lockedChapters.includes(chapterName);
-        const isLocked = isInLockedList && totalPages === 0;
-        
-        // For locked chapters: preserve old date or use NOW if new
-        let uploadDate;
-        if (isLocked && !folderExists) {
-            // Check if chapter existed before
-            const oldChapter = oldMangaData && oldMangaData.chapters && oldMangaData.chapters[chapterName];
-            if (oldChapter && oldChapter.uploadDate) {
-                // Keep old date (locked chapter already existed)
-                uploadDate = oldChapter.uploadDate;
-                console.log(`🔒 Keeping old date for locked ${chapterName}: ${uploadDate}`);
-            } else {
-                // New locked chapter - use NOW
-                uploadDate = getWIBTimestamp();
-                console.log(`🔒 NEW locked chapter ${chapterName}: ${uploadDate}`);
+            
+            // Get upload date from git or existing data
+            let uploadDate = now;
+            if (fs.existsSync('manga.json')) {
+                const oldData = JSON.parse(fs.readFileSync('manga.json', 'utf8'));
+                if (oldData.chapters && oldData.chapters[folder]) {
+                    uploadDate = oldData.chapters[folder].uploadDate || now;
+                }
             }
-        } else {
-            // Unlocked chapter - use folder date
-            uploadDate = folderExists ? getUploadDate(chapterName, isLocked) : getWIBTimestamp();
-        }
-        
-        const views = isFirstTime ? 0 : getOldChapterViews(chapterName, oldMangaData);
-        
-        chapters[chapterName] = {
-            title: getChapterTitle(chapterName),
-            chapter: getChapterNumber(chapterName),
-            folder: chapterName,
-            uploadDate: uploadDate,
-            totalPages: totalPages,
-            pages: totalPages,
-            locked: isLocked,
-            views: views
-        };
-        
-        if (!isLocked && folderExists) {
-            unlockedChaptersWithDates.push({
-                chapterName: chapterName,
-                uploadDate: uploadDate
-            });
-        }
-        
-        const lockIcon = isLocked ? '🔒' : '✅';
-        const typeIcon = isOneshotFolder(chapterName) ? '🎯' : '📄';
-        const dateStr = uploadDate.split('T')[0];
-        console.log(`${lockIcon}${typeIcon} ${chapterName} - ${totalPages} pages - ${dateStr} - ${views} views`);
-    });
-    
-    // AUTO-CLEANUP: Remove uploaded chapters from lockedChapters
-    const updatedLockedChapters = config.lockedChapters.filter(chapterName => {
-        const folderExists = checkIfFolderExists(chapterName);
-        const totalPages = folderExists ? getTotalPagesFromManifest(chapterName) : 0;
-        return totalPages === 0;
-    });
-    
-    if (updatedLockedChapters.length !== config.lockedChapters.length) {
-        console.log('\n🔓 Auto-removing uploaded chapters from lockedChapters...');
-        const removed = config.lockedChapters.filter(ch => !updatedLockedChapters.includes(ch));
-        console.log(`   Removed: ${removed.join(', ')}`);
-        
-        config.lockedChapters = updatedLockedChapters;
-        
-        if (saveJSON('manga-config.json', config)) {
-            console.log('✅ manga-config.json updated');
-        }
-    }
-    
-    // 🔥 CALCULATE lastChapterUpdate FROM ALL CHAPTERS (unlocked + locked)
-    let lastChapterUpdate = null;
-    
-    // Get ALL chapter dates (including locked)
-    const allChapterDates = Object.values(chapters).map(ch => ({
-        chapterName: ch.folder,
-        uploadDate: ch.uploadDate,
-        locked: ch.locked
-    }));
-    
-    if (allChapterDates.length > 0) {
-        // Sort by date (newest first)
-        allChapterDates.sort((a, b) => {
-            return new Date(b.uploadDate) - new Date(a.uploadDate);
-        });
-        
-        // Use the NEWEST chapter (locked or unlocked)
-        lastChapterUpdate = allChapterDates[0].uploadDate;
-        
-        const lockIcon = allChapterDates[0].locked ? '🔒' : '✅';
-        console.log(`\n${lockIcon} Last chapter update: ${lastChapterUpdate} (from ${allChapterDates[0].locked ? 'LOCKED' : 'unlocked'} chapter ${allChapterDates[0].chapterName})`);
-    } else {
-        console.log('\n⚠️  No chapters found, using current date');
-        lastChapterUpdate = getWIBTimestamp();
-    }
-    
-    return { chapters, lastChapterUpdate };
-}
-
-function commandGenerate() {
-    console.log('📚 Generating manga.json...\n');
-    
-    // Ensure pending files exist first
-    ensurePendingFilesExist();
-    
-    const config = loadConfig();
-    const oldMangaData = loadJSON('manga.json');
-    
-    const isFirstTime = !oldMangaData || !oldMangaData.manga;
-    
-    if (isFirstTime) {
-        console.log('🆕 First-time generation - creating new manga.json');
-    } else {
-        console.log('🔄 Updating existing manga.json');
-    }
-    
-    const { chapters, lastChapterUpdate } = generateChaptersData(config, oldMangaData, isFirstTime);
-    
-    let totalViews = 0;
-    let hasChapterChanges = false;
-    
-    if (oldMangaData && oldMangaData.manga) {
-        totalViews = oldMangaData.manga.views || 0;
-        
-        const oldChapterCount = Object.keys(oldMangaData.chapters || {}).length;
-        const newChapterCount = Object.keys(chapters).length;
-        
-        hasChapterChanges = oldChapterCount !== newChapterCount;
-    } else {
-        totalViews = config.views || 0;
-    }
-    
-    const repoUrl = `https://raw.githubusercontent.com/${config.repoOwner}/${config.repoName}/main/`;
-    
-    const mangaJSON = {
-        manga: {
-            title: config.title,
-            alternativeTitle: config.alternativeTitle,
-            cover: config.cover,
-            description: config.description,
-            author: config.author,
-            artist: config.artist,
-            genre: config.genre,
-            status: config.status,
-            views: totalViews,
-            links: config.links,
-            repoUrl: repoUrl,
-            imagePrefix: config.imagePrefix || 'Image',
-            imageFormat: config.imageFormat || 'jpg',
-            lockedChapters: config.lockedChapters || []
-        },
-        chapters: chapters,
-        lastUpdated: getWIBTimestamp(),
-        lastChapterUpdate: lastChapterUpdate
-    };
-    
-    if (saveJSON('manga.json', mangaJSON)) {
-        console.log('\n✅ manga.json generated successfully!');
-        console.log(`📊 Stats:`);
-        console.log(`   Total chapters: ${Object.keys(chapters).length}`);
-        
-        const lockedCount = Object.values(chapters).filter(ch => ch.locked).length;
-        const unlockedCount = Object.values(chapters).filter(ch => !ch.locked).length;
-        const oneshotCount = Object.keys(chapters).filter(ch => isOneshotFolder(ch)).length;
-        const totalChapterViews = Object.values(chapters).reduce((sum, ch) => sum + (ch.views || 0), 0);
-        
-        console.log(`🔒 Locked chapters: ${lockedCount}`);
-        console.log(`🔓 Unlocked chapters: ${unlockedCount}`);
-        if (oneshotCount > 0) {
-            console.log(`🎯 Oneshot chapters: ${oneshotCount}`);
-        }
-        console.log(`👁️  Total manga views: ${totalViews}`);
-        console.log(`👁️  Total chapter views: ${totalChapterViews}`);
-        console.log(`📅 Last updated: ${mangaJSON.lastUpdated}`);
-        console.log(`📅 Last chapter update: ${mangaJSON.lastChapterUpdate}`);
-        
-        if (hasChapterChanges) {
-            console.log('🆕 Chapter changes detected!');
-        }
-    } else {
-        process.exit(1);
-    }
-}
-
-// ============================================
-// COMMAND 2: SYNC CHAPTERS
-// ============================================
-
-function ensurePendingFilesExist() {
-    console.log('🔍 Checking pending files...\n');
-    
-    let created = false;
-    
-    // Check and create pending-views.json
-    if (!fs.existsSync('pending-views.json')) {
-        console.log('📄 Creating pending-views.json...');
-        const initialPendingViews = {
-            pendingViews: 0,
-            lastIncrement: getWIBTimestamp(),
-            lastUpdate: getWIBTimestamp()
-        };
-        saveJSON('pending-views.json', initialPendingViews);
-        created = true;
-    }
-    
-    // Check and create pending-chapter-views.json
-    if (!fs.existsSync('pending-chapter-views.json')) {
-        console.log('📄 Creating pending-chapter-views.json...');
-        const initialPendingChapters = {
-            chapters: {},
-            lastUpdated: getWIBTimestamp()
-        };
-        saveJSON('pending-chapter-views.json', initialPendingChapters);
-        created = true;
-    }
-    
-    if (created) {
-        console.log('✅ Initial pending files created!\n');
-    } else {
-        console.log('✅ All pending files exist\n');
-    }
-}
-
-function commandSync() {
-    console.log('🔄 Starting chapter sync...\n');
-    
-    const mangaData = loadJSON('manga.json');
-    
-    if (!mangaData || !mangaData.chapters) {
-        console.error('❌ No chapters found in manga.json');
-        process.exit(1);
-    }
-    
-    console.log(`📚 manga.json found with ${Object.keys(mangaData.chapters).length} chapters`);
-    
-    let pendingData = {
-        chapters: {},
-        lastUpdated: getWIBTimestamp()
-    };
-    
-    const existingPending = loadJSON('pending-chapter-views.json');
-    if (existingPending) {
-        console.log('📖 Found existing pending-chapter-views.json');
-        pendingData.chapters = existingPending.chapters || {};
-    } else {
-        console.log('📖 Creating new pending-chapter-views.json');
-    }
-    
-    let addedCount = 0;
-    const totalChapters = Object.keys(mangaData.chapters).length;
-    
-    console.log('\n📋 Syncing chapters:');
-    
-    Object.keys(mangaData.chapters).forEach(chapterKey => {
-        if (!pendingData.chapters[chapterKey]) {
-            pendingData.chapters[chapterKey] = {
-                pendingViews: 0,
-                lastIncrement: getWIBTimestamp(),
-                lastUpdate: getWIBTimestamp()
+            
+            const chapterTitle = `Chapter ${folder}`;
+            
+            chapters[folder] = {
+                title: chapterTitle,
+                chapter: chapterNum,
+                folder: folder,
+                uploadDate: uploadDate,
+                totalPages: manifest.pages.length,
+                pages: manifest.pages.length,
+                locked: isLocked,
+                views: existingViews
             };
-            const icon = isOneshotFolder(chapterKey) ? '🎯' : '✔';
-            console.log(`  ${icon} Added new chapter: ${chapterKey}`);
-            addedCount++;
+        }
+        
+        console.log(`✅ Processed ${Object.keys(chapters).length} chapters`);
+        
+        // ============================================
+        // ✅ FIX: Handle endChapter based on status
+        // LINE 103-118 (BAGIAN YANG DIUBAH)
+        // ============================================
+        let endChapterValue;
+        
+        if (mangaConfig.status === 'END') {
+            // Jika status END, harus ada endChapter
+            if (mangaConfig.endChapter) {
+                endChapterValue = mangaConfig.endChapter;
+                console.log(`🏁 Status: END - endChapter: ${endChapterValue}`);
+            } else {
+                console.warn('⚠️ Status is END but endChapter not set in manga-config.json!');
+                endChapterValue = null;
+            }
         } else {
-            const icon = isOneshotFolder(chapterKey) ? '🎯' : '✔';
-            console.log(`  ${icon} Chapter ${chapterKey} already exists`);
+            // Jika status ONGOING/HIATUS, set endChapter ke null
+            endChapterValue = null;
+            console.log(`📖 Status: ${mangaConfig.status} - endChapter: null`);
         }
-    });
-    
-    pendingData.lastUpdated = getWIBTimestamp();
-    
-    if (saveJSON('pending-chapter-views.json', pendingData)) {
-        console.log(`\n✅ Sync completed!`);
-        console.log(`📊 Total chapters: ${totalChapters}`);
-        console.log(`📈 New chapters added: ${addedCount}`);
-        console.log(`🕐 Last updated: ${pendingData.lastUpdated}`);
-    } else {
-        process.exit(1);
+        
+        // Get existing views from old manga.json
+        let existingMangaViews = 0;
+        if (fs.existsSync('manga.json')) {
+            const oldData = JSON.parse(fs.readFileSync('manga.json', 'utf8'));
+            if (oldData.manga && oldData.manga.views) {
+                existingMangaViews = oldData.manga.views;
+            }
+        }
+        
+        // Build full manga.json structure
+        const mangaJson = {
+            manga: {
+                title: mangaConfig.title,
+                alternativeTitle: mangaConfig.alternativeTitle || '',
+                cover: mangaConfig.cover,
+                description: mangaConfig.description,
+                author: mangaConfig.author,
+                artist: mangaConfig.artist,
+                genre: mangaConfig.genre || [],
+                status: mangaConfig.status || 'ONGOING',
+                views: existingMangaViews,
+                links: mangaConfig.links || {},
+                repoUrl: `https://raw.githubusercontent.com/${mangaConfig.repoOwner}/${mangaConfig.repoName}/main/`,
+                imagePrefix: mangaConfig.imagePrefix || 'Image',
+                imageFormat: mangaConfig.imageFormat || 'webp',
+                lockedChapters: mangaConfig.lockedChapters || [],
+                type: mangaConfig.type || 'manga'
+            },
+            chapters: chapters,
+            lastUpdated: now,
+            lastChapterUpdate: now
+        };
+        
+        // ============================================
+        // ✅ Add endChapter only if status is END
+        // LINE 163-166 (BAGIAN YANG DITAMBAHKAN)
+        // ============================================
+        if (mangaConfig.status === 'END' && endChapterValue !== null) {
+            mangaJson.manga.endChapter = endChapterValue;
+        }
+        
+        // Write manga.json
+        fs.writeFileSync('manga.json', JSON.stringify(mangaJson, null, 2));
+        
+        console.log('✅ manga.json generated successfully!');
+        console.log(`   - Total chapters: ${Object.keys(chapters).length}`);
+        console.log(`   - Status: ${mangaJson.manga.status}`);
+        if (mangaJson.manga.endChapter) {
+            console.log(`   - End Chapter: ${mangaJson.manga.endChapter}`);
+        }
+        console.log(`   - Type: ${mangaJson.manga.type}`);
+        console.log(`   - Last updated: ${now}`);
+        
+    } catch (error) {
+        console.error('❌ Error generating manga.json:', error);
+        throw error;
     }
 }
 
 // ============================================
-// COMMAND 3: UPDATE MANGA VIEWS
+// SYNC CHAPTERS
 // ============================================
 
-function commandUpdateViews() {
-    console.log('📊 Checking view counter...\n');
-    
-    // Ensure pending files exist
-    ensurePendingFilesExist();
-    
-    const pendingData = loadJSON('pending-views.json');
-    const manga = loadJSON('manga.json');
-    
-    if (!pendingData || !manga) {
-        console.error('❌ Required files not found');
-        process.exit(1);
-    }
-    
-    const pendingViews = pendingData.pendingViews || 0;
-    
-    console.log(`📊 Pending views: ${pendingViews}`);
-    
-    if (pendingViews < VIEW_THRESHOLD) {
-        console.log(`⏳ Not enough views yet (${pendingViews}/${VIEW_THRESHOLD}). Waiting...`);
-        process.exit(0);
-    }
-    
-    console.log(`✅ Threshold reached! Updating manga.json...`);
-    
-    manga.manga.views = (manga.manga.views || 0) + pendingViews;
-    
-    if (saveJSON('manga.json', manga)) {
-        pendingData.pendingViews = 0;
-        pendingData.lastUpdate = getWIBTimestamp();
+async function syncChapters() {
+    try {
+        console.log('🔄 Syncing chapters...');
         
-        if (saveJSON('pending-views.json', pendingData)) {
-            console.log(`✅ Views updated! Total: ${manga.manga.views}`);
-            console.log(`🔄 Pending views reset to 0`);
-        }
-    } else {
-        process.exit(1);
-    }
-}
-
-// ============================================
-// COMMAND 4: UPDATE CHAPTER VIEWS
-// ============================================
-
-function commandUpdateChapterViews() {
-    console.log('📖 Checking chapter views counter...\n');
-    
-    // Ensure pending files exist
-    ensurePendingFilesExist();
-    
-    const pendingData = loadJSON('pending-chapter-views.json');
-    const manga = loadJSON('manga.json');
-    
-    if (!pendingData || !manga) {
-        console.error('❌ Required files not found');
-        process.exit(1);
-    }
-    
-    console.log('📊 Checking pending chapter views...');
-    
-    let hasChanges = false;
-    let updatedChapters = 0;
-    let updatedLockedChapters = 0;
-    
-    Object.keys(pendingData.chapters).forEach(chapterFolder => {
-        const pendingChapterData = pendingData.chapters[chapterFolder];
-        const pendingViews = pendingChapterData.pendingViews || 0;
-        
-        if (!manga.chapters[chapterFolder]) {
-            console.log(`⚠️  Chapter ${chapterFolder} not found in manga.json`);
+        if (!fs.existsSync('manga.json')) {
+            console.log('⚠️ manga.json not found, generating first...');
+            await generateMangaJson();
             return;
         }
         
-        const chapter = manga.chapters[chapterFolder];
-        const isLocked = chapter.locked || false;
-        const isOneshot = isOneshotFolder(chapterFolder);
+        const mangaData = JSON.parse(fs.readFileSync('manga.json', 'utf8'));
+        const mangaConfig = JSON.parse(fs.readFileSync('manga-config.json', 'utf8'));
         
-        if (pendingViews >= CHAPTER_VIEW_THRESHOLD) {
-            const lockIcon = isLocked ? '🔒' : '✅';
-            const typeIcon = isOneshot ? '🎯' : '';
-            
-            if (isLocked) {
-                console.log(`${lockIcon}${typeIcon} Locked ${chapterFolder}: Threshold reached! (${pendingViews}/${CHAPTER_VIEW_THRESHOLD})`);
-                updatedLockedChapters++;
+        // Get all chapter folders
+        const chapterFolders = fs.readdirSync('.')
+            .filter(item => {
+                if (!fs.statSync(item).isDirectory()) return false;
+                if (item.startsWith('.')) return false;
+                if (['node_modules', 'assets', '.github'].includes(item)) return false;
+                return fs.existsSync(path.join(item, 'manifest.json'));
+            });
+        
+        let hasChanges = false;
+        const now = getWIBTimestamp();
+        
+        // Check for new chapters
+        for (const folder of chapterFolders) {
+            if (!mangaData.chapters[folder]) {
+                console.log(`✨ New chapter detected: ${folder}`);
+                
+                const manifestPath = path.join(folder, 'manifest.json');
+                const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+                
+                const chapterNum = parseFloat(folder);
+                const isLocked = mangaConfig.lockedChapters?.includes(folder) || false;
+                
+                mangaData.chapters[folder] = {
+                    title: `Chapter ${folder}`,
+                    chapter: chapterNum,
+                    folder: folder,
+                    uploadDate: now,
+                    totalPages: manifest.pages.length,
+                    pages: manifest.pages.length,
+                    locked: isLocked,
+                    views: 0
+                };
+                
+                hasChanges = true;
+                mangaData.lastChapterUpdate = now;
+            }
+        }
+        
+        // Check for deleted chapters
+        for (const folder in mangaData.chapters) {
+            if (!chapterFolders.includes(folder)) {
+                console.log(`🗑️ Chapter deleted: ${folder}`);
+                delete mangaData.chapters[folder];
+                hasChanges = true;
+            }
+        }
+        
+        if (hasChanges) {
+            mangaData.lastUpdated = now;
+            fs.writeFileSync('manga.json', JSON.stringify(mangaData, null, 2));
+            console.log('✅ Chapters synced successfully!');
+        } else {
+            console.log('ℹ️ No changes detected');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error syncing chapters:', error);
+        throw error;
+    }
+}
+
+// ============================================
+// UPDATE VIEWS FROM PENDING-VIEWS.JSON
+// ============================================
+
+async function updateViews() {
+    try {
+        console.log('📊 Updating manga views...');
+        
+        if (!fs.existsSync('pending-views.json')) {
+            console.log('ℹ️ No pending views to process');
+            return;
+        }
+        
+        if (!fs.existsSync('manga.json')) {
+            console.log('⚠️ manga.json not found!');
+            return;
+        }
+        
+        const pendingViews = JSON.parse(fs.readFileSync('pending-views.json', 'utf8'));
+        const mangaData = JSON.parse(fs.readFileSync('manga.json', 'utf8'));
+        
+        if (!pendingViews.views || pendingViews.views === 0) {
+            console.log('ℹ️ No pending views to add');
+            return;
+        }
+        
+        const currentViews = mangaData.manga.views || 0;
+        const newViews = currentViews + pendingViews.views;
+        
+        mangaData.manga.views = newViews;
+        mangaData.lastUpdated = getWIBTimestamp();
+        
+        fs.writeFileSync('manga.json', JSON.stringify(mangaData, null, 2));
+        
+        // Reset pending views
+        fs.writeFileSync('pending-views.json', JSON.stringify({ views: 0 }, null, 2));
+        
+        console.log(`✅ Added ${pendingViews.views} views`);
+        console.log(`   Total views: ${currentViews} → ${newViews}`);
+        
+    } catch (error) {
+        console.error('❌ Error updating views:', error);
+        throw error;
+    }
+}
+
+// ============================================
+// UPDATE CHAPTER VIEWS
+// ============================================
+
+async function updateChapterViews() {
+    try {
+        console.log('📖 Updating chapter views...');
+        
+        if (!fs.existsSync('pending-chapter-views.json')) {
+            console.log('ℹ️ No pending chapter views to process');
+            return;
+        }
+        
+        if (!fs.existsSync('manga.json')) {
+            console.log('⚠️ manga.json not found!');
+            return;
+        }
+        
+        const pendingChapterViews = JSON.parse(fs.readFileSync('pending-chapter-views.json', 'utf8'));
+        const mangaData = JSON.parse(fs.readFileSync('manga.json', 'utf8'));
+        
+        if (!pendingChapterViews.chapters || Object.keys(pendingChapterViews.chapters).length === 0) {
+            console.log('ℹ️ No pending chapter views to add');
+            return;
+        }
+        
+        let totalAdded = 0;
+        
+        for (const [chapter, count] of Object.entries(pendingChapterViews.chapters)) {
+            if (mangaData.chapters[chapter]) {
+                const oldViews = mangaData.chapters[chapter].views || 0;
+                const newViews = oldViews + count;
+                mangaData.chapters[chapter].views = newViews;
+                
+                console.log(`   Chapter ${chapter}: ${oldViews} → ${newViews} (+${count})`);
+                totalAdded += count;
             } else {
-                console.log(`${lockIcon}${typeIcon} ${chapterFolder}: Threshold reached! (${pendingViews}/${CHAPTER_VIEW_THRESHOLD})`);
+                console.warn(`   ⚠️ Chapter ${chapter} not found in manga.json`);
             }
-            
-            chapter.views = (chapter.views || 0) + pendingViews;
-            
-            pendingChapterData.pendingViews = 0;
-            pendingChapterData.lastUpdate = getWIBTimestamp();
-            
-            console.log(`   Total views: ${chapter.views}`);
-            
-            hasChanges = true;
-            updatedChapters++;
-        } else {
-            const icon = isLocked ? '🔒' : '⏳';
-            const typeIcon = isOneshot ? '🎯' : '';
-            console.log(`${icon}${typeIcon} ${chapterFolder}: Waiting... (${pendingViews}/${CHAPTER_VIEW_THRESHOLD})`);
         }
-    });
-    
-    if (hasChanges) {
-        manga.lastUpdated = getWIBTimestamp();
         
-        if (saveJSON('manga.json', manga) && saveJSON('pending-chapter-views.json', pendingData)) {
-            console.log(`\n✅ Updated ${updatedChapters} chapter(s)!`);
-            if (updatedLockedChapters > 0) {
-                console.log(`🔒 Including ${updatedLockedChapters} locked chapter(s)`);
-            }
-            console.log(`🔄 Files written successfully`);
+        if (totalAdded > 0) {
+            mangaData.lastUpdated = getWIBTimestamp();
+            fs.writeFileSync('manga.json', JSON.stringify(mangaData, null, 2));
+            
+            // Reset pending chapter views
+            fs.writeFileSync('pending-chapter-views.json', JSON.stringify({ chapters: {} }, null, 2));
+            
+            console.log(`✅ Added ${totalAdded} chapter views total`);
         } else {
-            process.exit(1);
+            console.log('ℹ️ No valid chapter views to add');
         }
-    } else {
-        console.log(`\n⏳ No chapters reached threshold yet`);
+        
+    } catch (error) {
+        console.error('❌ Error updating chapter views:', error);
+        throw error;
     }
 }
 
 // ============================================
-// MAIN
+// SYNC CODES FROM CLOUDFLARE KV (WEBTOON ONLY)
 // ============================================
 
-function main() {
-    const command = process.argv[2];
-    
-    console.log('╔═══════════════════════════════════════╗');
-    console.log('║   MANGA AUTOMATION SCRIPT v5.0 WIB   ║');
-    console.log('║  ✅ WIB Timezone (GMT+7)             ║');
-    console.log('║  ✅ Manifest-based Detection         ║');
-    console.log('║  🎯 Oneshot Support                  ║');
-    console.log('╚═══════════════════════════════════════╝\n');
-    
-    switch (command) {
-        case 'generate':
-            commandGenerate();
-            break;
-        case 'sync':
-            commandSync();
-            break;
-        case 'update-views':
-            commandUpdateViews();
-            break;
-        case 'update-chapters':
-            commandUpdateChapterViews();
-            break;
-        default:
-            console.log('Usage:');
-            console.log('  node manga-automation.js generate         → Generate manga.json');
-            console.log('  node manga-automation.js sync             → Sync chapters');
-            console.log('  node manga-automation.js update-views     → Update manga views');
-            console.log('  node manga-automation.js update-chapters  → Update chapter views');
-            process.exit(1);
+async function syncCodesFromCloudflare() {
+    try {
+        console.log('🔄 Syncing codes from Cloudflare KV...');
+        
+        // Check manga type
+        if (!fs.existsSync('manga-config.json')) {
+            console.log('⚠️ manga-config.json not found!');
+            return;
+        }
+        
+        const mangaConfig = JSON.parse(fs.readFileSync('manga-config.json', 'utf8'));
+        
+        if (mangaConfig.type !== 'webtoon') {
+            console.log(`ℹ️ Type is ${mangaConfig.type}, skipping code sync`);
+            return;
+        }
+        
+        // Check if chapter-codes-local.json is empty
+        if (fs.existsSync('chapter-codes-local.json')) {
+            const localCodes = JSON.parse(fs.readFileSync('chapter-codes-local.json', 'utf8'));
+            if (Object.keys(localCodes).length > 0) {
+                console.log('✅ chapter-codes-local.json already has data, skipping sync');
+                return;
+            }
+        }
+        
+        const workerUrl = process.env.CLOUDFLARE_WORKER_URL;
+        if (!workerUrl) {
+            console.log('⚠️ CLOUDFLARE_WORKER_URL not set, skipping code sync');
+            return;
+        }
+        
+        console.log(`📡 Fetching codes from: ${workerUrl}`);
+        
+        const fetch = (await import('node-fetch')).default;
+        const response = await fetch(`${workerUrl}?action=getAllCodes&repoName=${mangaConfig.repoName}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.codes) {
+            fs.writeFileSync('chapter-codes-local.json', JSON.stringify(data.codes, null, 2));
+            console.log(`✅ Synced ${Object.keys(data.codes).length} codes from Cloudflare KV`);
+        } else {
+            console.log('ℹ️ No codes found in Cloudflare KV');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error syncing codes:', error);
+        // Don't throw - this is optional functionality
     }
 }
 
-main();
+// ============================================
+// MAIN CLI
+// ============================================
+
+const command = process.argv[2];
+
+(async () => {
+    try {
+        switch (command) {
+            case 'generate':
+                await generateMangaJson();
+                break;
+            
+            case 'sync':
+                await syncChapters();
+                break;
+            
+            case 'update-views':
+                await updateViews();
+                break;
+            
+            case 'update-chapters':
+                await updateChapterViews();
+                break;
+            
+            case 'sync-codes':
+                await syncCodesFromCloudflare();
+                break;
+            
+            default:
+                console.log('Usage:');
+                console.log('  node manga-automation.js generate        - Generate manga.json');
+                console.log('  node manga-automation.js sync            - Sync chapters');
+                console.log('  node manga-automation.js update-views    - Update manga views');
+                console.log('  node manga-automation.js update-chapters - Update chapter views');
+                console.log('  node manga-automation.js sync-codes      - Sync codes from Cloudflare KV');
+                process.exit(1);
+        }
+        
+        console.log('✅ Done!');
+        
+    } catch (error) {
+        console.error('❌ Fatal error:', error);
+        process.exit(1);
+    }
+})();
