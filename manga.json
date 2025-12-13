@@ -16,7 +16,7 @@
       "Ghost"
     ],
     "status": "END",
-    "views": 215,
+    "views": 226,
     "links": {
       "mangadex": "https://mangadex.org/title/832a0bcb-f58a-4118-9130-43c03d289a8d/moshimo-yuurei-ga-hatsukoi-o-shitara",
       "raw": "https://bookwalker.jp/series/494400/"
@@ -37,7 +37,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 57
+      "views": 60
     },
     "2": {
       "title": "Chapter 2",
@@ -47,7 +47,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 23
+      "views": 24
     },
     "3": {
       "title": "Chapter 3",
@@ -57,7 +57,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 16
+      "views": 17
     },
     "4": {
       "title": "Chapter 4",
@@ -67,7 +67,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 15
+      "views": 16
     },
     "5": {
       "title": "Chapter 5",
@@ -77,7 +77,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 12
+      "views": 13
     },
     "6": {
       "title": "Chapter 6",
@@ -87,7 +87,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 12
+      "views": 13
     },
     "7": {
       "title": "Chapter 7",
@@ -97,7 +97,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 14
+      "views": 16
     },
     "8": {
       "title": "Chapter 8",
@@ -107,7 +107,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 11
+      "views": 12
     },
     "9": {
       "title": "Chapter 9",
@@ -117,7 +117,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 9
+      "views": 10
     },
     "10": {
       "title": "Chapter 10",
@@ -127,7 +127,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 11
+      "views": 12
     },
     "11": {
       "title": "Chapter 11",
@@ -137,7 +137,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 11
+      "views": 12
     },
     "12": {
       "title": "Chapter 12",
@@ -147,7 +147,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 7
+      "views": 8
     },
     "13": {
       "title": "Chapter 13",
@@ -157,7 +157,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 7
+      "views": 8
     },
     "14": {
       "title": "Chapter 14",
@@ -167,7 +167,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 7
+      "views": 8
     },
     "15": {
       "title": "Chapter 15",
@@ -177,7 +177,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 6
+      "views": 7
     },
     "16": {
       "title": "Chapter 16",
@@ -187,7 +187,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 7
+      "views": 8
     },
     "17": {
       "title": "Chapter 17",
@@ -277,9 +277,9 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 91
+      "views": 94
     }
   },
-  "lastUpdated": "2025-12-13T00:26:28+07:00",
+  "lastUpdated": "2025-12-14T00:23:07+07:00",
   "lastChapterUpdate": "2025-12-03T20:49:56+07:00"
 }
