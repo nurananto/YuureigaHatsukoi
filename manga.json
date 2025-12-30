@@ -16,7 +16,7 @@
       "Ghost"
     ],
     "status": "END",
-    "views": 311,
+    "views": 316,
     "links": {
       "mangadex": "https://mangadex.org/title/832a0bcb-f58a-4118-9130-43c03d289a8d/moshimo-yuurei-ga-hatsukoi-o-shitara",
       "raw": "https://bookwalker.jp/series/494400/"
@@ -37,7 +37,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 80
+      "views": 82
     },
     "2": {
       "title": "Chapter 2",
@@ -277,9 +277,9 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 134
+      "views": 135
     }
   },
-  "lastUpdated": "2025-12-30T00:25:50+07:00",
+  "lastUpdated": "2025-12-31T00:27:04+07:00",
   "lastChapterUpdate": "2025-12-03T20:49:56+07:00"
 }
