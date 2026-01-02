@@ -1,19 +1,19 @@
 {
   "chapters": {
     "1": {
-      "pendingViews": 1,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T05:38:23.146Z",
-      "lastUpdate": "2026-01-02T00:25:46+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "2": {
-      "pendingViews": 1,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T06:07:20.909Z",
-      "lastUpdate": "2026-01-01T00:25:02+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "3": {
-      "pendingViews": 1,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T06:09:01.042Z",
-      "lastUpdate": "2025-12-30T00:25:50+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "4": {
       "pendingViews": 0,
@@ -46,9 +46,9 @@
       "lastUpdate": "2025-12-24T00:27:11+07:00"
     },
     "10": {
-      "pendingViews": 1,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T06:22:04.128Z",
-      "lastUpdate": "2025-12-24T00:27:11+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "11": {
       "pendingViews": 0,
@@ -96,9 +96,9 @@
       "lastUpdate": "2025-12-24T00:27:11+07:00"
     },
     "20": {
-      "pendingViews": 1,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T14:39:21.384Z",
-      "lastUpdate": "2025-12-24T00:27:11+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "21": {
       "pendingViews": 0,
@@ -106,25 +106,25 @@
       "lastUpdate": "2025-12-24T00:27:11+07:00"
     },
     "22": {
-      "pendingViews": 1,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T14:39:49.007Z",
-      "lastUpdate": "2025-12-24T00:27:11+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "23": {
-      "pendingViews": 2,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T14:40:05.881Z",
-      "lastUpdate": "2025-12-24T00:27:11+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "24": {
-      "pendingViews": 3,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T14:41:03.093Z",
-      "lastUpdate": "2025-12-29T00:24:22+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     },
     "25": {
-      "pendingViews": 2,
+      "pendingViews": 0,
       "lastIncrement": "2026-01-02T14:41:22.994Z",
-      "lastUpdate": "2026-01-02T00:25:46+07:00"
+      "lastUpdate": "2026-01-03T00:24:42+07:00"
     }
   },
-  "lastUpdated": "2026-01-02T00:25:46+07:00"
+  "lastUpdated": "2026-01-03T00:24:42+07:00"
 }
