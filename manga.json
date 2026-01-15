@@ -16,7 +16,7 @@
       "Ghost"
     ],
     "status": "END",
-    "views": 373,
+    "views": 379,
     "links": {
       "mangadex": "https://mangadex.org/title/832a0bcb-f58a-4118-9130-43c03d289a8d/moshimo-yuurei-ga-hatsukoi-o-shitara",
       "raw": "https://bookwalker.jp/series/494400/"
@@ -37,7 +37,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 101
+      "views": 103
     },
     "2": {
       "title": "Chapter 2",
@@ -47,7 +47,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 41
+      "views": 42
     },
     "3": {
       "title": "Chapter 3",
@@ -57,7 +57,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 30
+      "views": 32
     },
     "4": {
       "title": "Chapter 4",
@@ -67,7 +67,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 25
+      "views": 26
     },
     "5": {
       "title": "Chapter 5",
@@ -267,7 +267,7 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 42
+      "views": 44
     },
     "25": {
       "title": "Chapter 25",
@@ -277,9 +277,9 @@
       "totalPages": 32,
       "pages": 32,
       "locked": false,
-      "views": 157
+      "views": 160
     }
   },
-  "lastUpdated": "2026-01-15T00:33:44+07:00",
+  "lastUpdated": "2026-01-16T00:39:14+07:00",
   "lastChapterUpdate": "2025-12-03T20:49:56+07:00"
 }
