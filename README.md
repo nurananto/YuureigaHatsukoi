@@ -12,9 +12,7 @@
 | Judul Alternatif | もしも、幽霊が初恋をしたら |
 | Author | Shichifuku Sayuri |
 | Tipe | Webtoon (Berwarna) |
-| Status | Tamat (Chapter 25) |
 | Genre | Shounen · Comedy · Drama · Romance · Horror · Mystery · Ghost |
-| Chapter | 25 chapter |
 
 ## Link
 
